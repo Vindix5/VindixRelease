@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friday Night Funkin’ Vs Vindix — The wait is over</title>
+<meta name="description" content="Friday Night Funkin’ Vs Vindix is back. Count down to release, then download the mod.">
+<meta name="theme-color" content="#2a2540">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0d0a1f;
+    --ink: #2a2540;
+    --sky: #5b9bff;
+    --sky-pale: #c9defc;
+    --indigo: #3a2fd1;
+    --mic: #7a63a8;
+    --mic-light: #cdb6ff;
+    --display: 'Luckiest Guy', 'Impact', 'Arial Black', sans-serif;
+    --text: 'Rubik', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  html { color-scheme: dark; }
+
+  body {
+    min-height: 100svh;
+    overflow-x: clip;
+    font-family: var(--text);
+    line-height: 1.55;
+    color: #fff;
+    background: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Background video (slightly blurred) ---------- */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: #17113a url("assets/poster.jpg") center / cover no-repeat;
+  }
+  .bg video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(6px) saturate(1.15);
+    transform: scale(1.08); /* hides the soft edges the blur creates */
+  }
+  .bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(58, 47, 209, .14), rgba(13, 10, 31, .55) 80%),
+      linear-gradient(180deg, rgba(13, 10, 31, .4), rgba(13, 10, 31, .2) 40%, rgba(13, 10, 31, .7));
+  }
+
+  /* ---------- Top bar ---------- */
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 16px 0;
+  }
+  .badge {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 4px solid var(--black);
+    box-shadow: 0 4px 0 var(--black);
+  }
+  .badge img { width: 40px; height: 40px; display: block; }
+  .kicker {
+    font-family: var(--display);
+    font-size: clamp(18px, 4vw, 26px);
+    letter-spacing: .02em;
+    color: var(--sky-pale);
+    -webkit-text-stroke: .2em var(--black);
+    paint-order: stroke fill;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: clamp(16px, 3vw, 24px);
+    padding: clamp(14px, 4vw, 36px) 20px 0;
+  }
+
+  .logo {
+    width: min(560px, 86vw);
+    height: auto;
+    transform-origin: 50% 65%;
+    filter: drop-shadow(0 0 30px rgba(91, 155, 255, .5));
+    animation: bump 1.2s ease-out infinite; /* two beats at 100 BPM */
+  }
+  @keyframes bump {
+    0%   { transform: scale(1.06) rotate(-1.2deg); }
+    25%  { transform: scale(1) rotate(0); }
+    50%  { transform: scale(1.06) rotate(1.2deg); }
+    75%  { transform: scale(1) rotate(0); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .hero h1 {
+    max-width: 18ch;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(36px, 7.4vw, 68px);
+    line-height: 1.04;
+    letter-spacing: .01em;
+    text-wrap: balance;
+    color: #fff;
+    -webkit-text-stroke: .2em var(--black);
+    paint-order: stroke fill;
+    text-shadow: 0 .07em 0 var(--indigo);
+  }
+
+  /* ---------- Countdown / Download button ---------- */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 3vw, 22px);
+    min-height: 88px;
+    padding: 12px clamp(18px, 4vw, 38px);
+    border: 5px solid var(--black);
+    border-radius: 24px;
+    background: var(--ink);
+    box-shadow: 0 8px 0 var(--black);
+    color: var(--sky-pale);
+    font-family: var(--display);
+    text-decoration: none;
+    user-select: none;
+    cursor: default;
+  }
+  .unit {
+    display: grid;
+    justify-items: center;
+    line-height: 1;
+  }
+  .num {
+    min-width: 1.7ch;
+    text-align: center;
+    font-size: clamp(30px, 8.4vw, 48px);
+  }
+  .lab {
+    margin-top: 7px;
+    font: 500 12px/1 var(--text);
+    letter-spacing: .04em;
+    color: var(--mic-light);
+  }
+
+  .cta.ready {
+    padding: 14px clamp(34px, 9vw, 70px);
+    background: linear-gradient(180deg, var(--sky), var(--indigo));
+    color: #fff;
+    font-size: clamp(36px, 9vw, 52px);
+    line-height: 1.1;
+    letter-spacing: .02em;
+    -webkit-text-stroke: .16em var(--black);
+    paint-order: stroke fill;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+    animation: glow 1.2s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 8px 0 var(--black), 0 0 0 0 rgba(91, 155, 255, 0); }
+    50%      { box-shadow: 0 8px 0 var(--black), 0 0 36px 8px rgba(91, 155, 255, .65); }
+  }
+  .cta.ready:hover { transform: translateY(-3px); }
+  .cta.ready:active { transform: translateY(6px); box-shadow: 0 2px 0 var(--black); }
+  .cta.ready:focus-visible { outline: 4px solid #fff; outline-offset: 5px; }
+
+  .hint {
+    margin-top: -4px;
+    font-size: 15px;
+    color: var(--sky-pale);
+  }
+
+  /* ---------- What's inside ---------- */
+  .info {
+    position: relative;
+    width: min(760px, calc(100% - 32px));
+    margin: clamp(40px, 7vw, 64px) auto 56px;
+    padding: clamp(24px, 4vw, 38px);
+    background: rgba(26, 20, 52, .8);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 5px solid var(--black);
+    border-radius: 26px;
+    box-shadow: 0 10px 0 var(--black);
+  }
+  .sticker {
+    position: absolute;
+    top: -38px;
+    right: 6px;
+    width: 64px;
+    height: 64px;
+    transform: rotate(10deg);
+    filter: drop-shadow(0 4px 0 var(--black));
+  }
+  .info h2 {
+    margin-bottom: 16px;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(28px, 5vw, 36px);
+    color: var(--sky);
+    -webkit-text-stroke: .2em var(--black);
+    paint-order: stroke fill;
+  }
+  .info ul {
+    display: grid;
+    gap: 13px;
+    padding: 0;
+    list-style: none;
+  }
+  .info li {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 14px;
+    align-items: start;
+    font-size: clamp(16px, 2.4vw, 18px);
+    max-width: 62ch;
+  }
+  /* bullets are the four note arrows of the game */
+  .info li::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+    background: var(--c);
+    clip-path: polygon(50% 0, 100% 50%, 70% 50%, 70% 100%, 30% 100%, 30% 50%, 0 50%);
+    transform: rotate(var(--r));
+  }
+  .info li:nth-child(4n + 1) { --c: #c24b99; --r: -90deg; }
+  .info li:nth-child(4n + 2) { --c: #00e5ff; --r: 180deg; }
+  .info li:nth-child(4n + 3) { --c: #12fa05; --r: 0deg; }
+  .info li:nth-child(4n + 4) { --c: #f9393f; --r: 90deg; }
+
+  .warn {
+    margin-top: 26px;
+    padding: 14px 18px;
+    border-left: 6px solid #ffc83c;
+    border-radius: 6px 14px 14px 6px;
+    background: rgba(255, 200, 60, .12);
+    font-size: 15.5px;
+    color: #fff3cf;
+    max-width: 66ch;
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .logo, .cta.ready { animation: none; }
+  }
+
+  noscript p { text-align: center; padding: 8px 16px; color: var(--sky-pale); }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <video id="bgvideo" autoplay muted loop playsinline preload="auto" poster="assets/poster.jpg">
+    <source src="assets/background.mp4" type="video/mp4">
+  </video>
+</div>
+
+<header class="top">
+  <span class="badge"><img src="assets/icon.png" alt="" width="40" height="40"></span>
+  <p class="kicker">Friday Night Funkin’ Vs Vindix</p>
+</header>
+
+<main>
+  <section class="hero">
+    <img class="logo" src="assets/logo.png" width="747" height="421" alt="Friday Night Funkin’ Vs Vindix logo">
+
+    <h1>The wait is over — Vindix is back!</h1>
+
+    <a id="cta" class="cta" aria-disabled="true">
+      <span class="unit"><span class="num" id="d">--</span><span class="lab">days</span></span>
+      <span class="unit"><span class="num" id="h">--</span><span class="lab">hours</span></span>
+      <span class="unit"><span class="num" id="m">--</span><span class="lab">minutes</span></span>
+      <span class="unit"><span class="num" id="s">--</span><span class="lab">seconds</span></span>
+    </a>
+    <p id="hint" class="hint">Download unlocks on December 15</p>
+    <noscript><p>Turn on JavaScript to see the countdown.</p></noscript>
+  </section>
+
+  <section class="info">
+    <img class="sticker" src="assets/icon.png" width="64" height="64" alt="">
+    <h2>What’s inside:</h2>
+    <ul>
+      <li>Week V with 4 intense tracks to test your rhythm</li>
+      <li>5 Bonus songs that flip the script when you least expect it</li>
+      <li>5 Erect Mixes — harder, faster, and built to push your limits</li>
+      <li>3 Pico Mixes that just hit different</li>
+      <li>A fully custom UI &amp; revamped menus</li>
+      <li>Spectacular events &amp; unexpected modcharts</li>
+    </ul>
+    <p class="warn">⚠️ <strong>Flashing Lights Note:</strong> Only affects specific tracks. An in-game warning will appear before those sections, and we made sure toggling “Flashing Lights” OFF in the settings fully disables the flashes.</p>
+  </section>
+</main>
+
+<script>
+  /* ===================== CONFIG ===================== */
+  // Release moment: 15 December 2026, 00:00 in the visitor's local time.
+  // Month is 0-based: 11 = December.
+  var RELEASE = new Date(2026, 11, 15, 0, 0, 0);
+  var DOWNLOAD_URL = 'https://gamebanana.com/mods/681142';
+  /* ================================================== */
+
+  (function () {
+    var cta  = document.getElementById('cta');
+    var hint = document.getElementById('hint');
+    var out  = {
+      d: document.getElementById('d'),
+      h: document.getElementById('h'),
+      m: document.getElementById('m'),
+      s: document.getElementById('s')
+    };
+    // Add ?unlock to the address to preview the Download state.
+    var forced = /[?&]unlock(&|=|$)/.test(location.search);
+    var ready = false;
+    var timer;
+
+    function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+    function unlock() {
+      if (ready) return;
+      ready = true;
+      clearInterval(timer);
+      cta.className = 'cta ready';
+      cta.textContent = 'Download';
+      cta.href = DOWNLOAD_URL;
+      cta.target = '_blank';
+      cta.rel = 'noopener';
+      cta.removeAttribute('aria-disabled');
+      cta.removeAttribute('aria-label');
+      hint.textContent = 'Opens the mod page on GameBanana';
+    }
+
+    function tick() {
+      var diff = RELEASE.getTime() - Date.now();
+      if (forced || diff <= 0) { unlock(); return; }
+      var t = Math.floor(diff / 1000);
+      var d = Math.floor(t / 86400);
+      var h = Math.floor((t % 86400) / 3600);
+      var m = Math.floor((t % 3600) / 60);
+      var s = t % 60;
+      out.d.textContent = pad(d);
+      out.h.textContent = pad(h);
+      out.m.textContent = pad(m);
+      out.s.textContent = pad(s);
+      cta.setAttribute('aria-label', 'Download unlocks in ' + d + ' days, ' + h + ' hours, ' + m + ' minutes');
+    }
+
+    tick();
+    if (!ready) timer = setInterval(tick, 250);
+
+    // Background video: respect reduced motion, ignore blocked autoplay.
+    var v = document.getElementById('bgvideo');
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.pause();
+    } else if (v.play) {
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+  })();
+</script>
+</body>
+</html>
