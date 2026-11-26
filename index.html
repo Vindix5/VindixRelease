@@ -4,29 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Friday Night Funkin’ Vs Vindix — The wait is over</title>
-<meta name="description" content="Friday Night Funkin’ Vs Vindix is back. Count down to release, then download the mod.">
-<meta name="theme-color" content="#2a2540">
+<meta name="description" content="Friday Night Funkin’ Vs Vindix is back. Play the 0.1.1 demo now and count down to the 0.1.2 release.">
+<meta name="theme-color" content="#14102e">
 <link rel="icon" type="image/png" href="assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0d0a1f;
-    --ink: #2a2540;
     --sky: #5b9bff;
     --sky-pale: #c9defc;
     --indigo: #3a2fd1;
-    --mic: #7a63a8;
     --mic-light: #cdb6ff;
-    --display: 'Luckiest Guy', 'Impact', 'Arial Black', sans-serif;
     --text: 'Rubik', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; }
-
-  html { color-scheme: dark; }
-
+  html { color-scheme: dark; scroll-behavior: smooth; }
   body {
     min-height: 100svh;
     overflow-x: clip;
@@ -36,8 +31,57 @@
     background: var(--black);
     -webkit-font-smoothing: antialiased;
   }
+  a { color: inherit; }
 
-  /* ---------- Background video (slightly blurred) ---------- */
+  /* =====================================================
+     LIQUID GLASS
+     translucent tint + blur + bright rim + soft highlight
+     ===================================================== */
+  .glass {
+    position: relative;
+    isolation: isolate;
+    border-radius: var(--r, 28px);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.20) 0%, rgba(255,255,255,.06) 38%, rgba(255,255,255,.04) 62%, rgba(255,255,255,.15) 100%),
+      rgba(34, 28, 92, .30);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,.55),
+      inset 0 -1px 1px rgba(255,255,255,.14),
+      inset 0 0 26px rgba(255,255,255,.07),
+      0 1px 2px rgba(5,3,25,.25),
+      0 18px 40px -10px rgba(5,3,30,.5);
+  }
+  /* soft light from the top-left corner */
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(90% 70% at 14% -12%, rgba(255,255,255,.30), rgba(255,255,255,0) 55%);
+  }
+  /* bright, uneven rim: strong on two opposite corners */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1.2px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(140deg, rgba(255,255,255,.9), rgba(255,255,255,.08) 32%, rgba(255,255,255,.04) 62%, rgba(255,255,255,.6));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass { background: rgba(38, 32, 98, .82); }
+  }
+
+  /* ---------- Background video ---------- */
   .bg {
     position: fixed;
     inset: 0;
@@ -49,190 +93,381 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: blur(6px) saturate(1.15);
-    transform: scale(1.08); /* hides the soft edges the blur creates */
+    filter: blur(8px) saturate(1.25);
+    transform: scale(1.1);
   }
   .bg::after {
     content: "";
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse at 50% 30%, rgba(58, 47, 209, .14), rgba(13, 10, 31, .55) 80%),
-      linear-gradient(180deg, rgba(13, 10, 31, .4), rgba(13, 10, 31, .2) 40%, rgba(13, 10, 31, .7));
+      radial-gradient(ellipse at 50% 20%, rgba(91,155,255,.12), rgba(13,10,31,.5) 80%),
+      linear-gradient(180deg, rgba(13,10,31,.35), rgba(13,10,31,.18) 40%, rgba(13,10,31,.65));
   }
 
-  /* ---------- Top bar ---------- */
+  /* ---------- Top navigation ---------- */
   .top {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 12px 14px 0;
+  }
+  .bar {
+    --r: 999px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 12px;
-    padding: 20px 16px 0;
+    width: min(1040px, 100%);
+    padding: 7px 8px 7px 10px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    min-width: 0;
   }
   .badge {
+    flex: none;
     display: grid;
     place-items: center;
-    width: 54px;
-    height: 54px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: var(--ink);
-    border: 4px solid var(--black);
-    box-shadow: 0 4px 0 var(--black);
+    background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.35), rgba(255,255,255,.06) 70%), rgba(20,16,60,.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,.6), inset 0 -1px 1px rgba(255,255,255,.15), 0 4px 12px rgba(5,3,30,.4);
   }
-  .badge img { width: 40px; height: 40px; display: block; }
-  .kicker {
-    font-family: var(--display);
-    font-size: clamp(18px, 4vw, 26px);
-    letter-spacing: .02em;
-    color: var(--sky-pale);
-    -webkit-text-stroke: .2em var(--black);
-    paint-order: stroke fill;
+  .badge img { width: 34px; height: 34px; display: block; }
+  .brand-text {
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    text-shadow: 0 1px 10px rgba(10,6,60,.6);
   }
 
-  /* ---------- Hero ---------- */
+  .tabs {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(8,6,36,.28);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.12);
+  }
+  .tab {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 17px;
+    border-radius: 999px;
+    color: rgba(255,255,255,.78);
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab:hover { color: #fff; }
+  .tab.active { color: #fff; }
+  .tab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .tab svg { width: 12px; height: 12px; opacity: .8; }
+  /* the sliding "lens" under the active tab */
+  .lens {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    opacity: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.12));
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,.75),
+      inset 0 -1px 1px rgba(255,255,255,.22),
+      0 4px 14px rgba(5,3,30,.4);
+    transition: transform .4s cubic-bezier(.3,1.25,.5,1), width .4s cubic-bezier(.3,1.25,.5,1);
+  }
+  .lens.no-anim { transition: none; }
+
+  /* ---------- Page layout ---------- */
   .hero {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     justify-items: center;
     text-align: center;
-    gap: clamp(16px, 3vw, 24px);
-    padding: clamp(14px, 4vw, 36px) 20px 0;
+    gap: clamp(14px, 2.4vw, 24px);
+    width: min(1040px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: clamp(10px, 2.2vw, 24px) 0 0;
   }
-
+  .kicker {
+    display: none;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -.01em;
+    color: var(--sky-pale);
+    text-shadow: 0 1px 10px rgba(10,6,60,.6);
+  }
   .logo {
-    width: min(560px, 86vw);
+    width: min(400px, 74vw);
     height: auto;
     transform-origin: 50% 65%;
-    filter: drop-shadow(0 0 30px rgba(91, 155, 255, .5));
+    filter: drop-shadow(0 0 28px rgba(91,155,255,.5));
     animation: bump 1.2s ease-out infinite; /* two beats at 100 BPM */
   }
   @keyframes bump {
-    0%   { transform: scale(1.06) rotate(-1.2deg); }
+    0%   { transform: scale(1.05) rotate(-1deg); }
     25%  { transform: scale(1) rotate(0); }
-    50%  { transform: scale(1.06) rotate(1.2deg); }
+    50%  { transform: scale(1.05) rotate(1deg); }
     75%  { transform: scale(1) rotate(0); }
     100% { transform: scale(1) rotate(0); }
   }
-
   .hero h1 {
-    max-width: 18ch;
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: clamp(36px, 7.4vw, 68px);
-    line-height: 1.04;
-    letter-spacing: .01em;
+    max-width: 20ch;
+    font-weight: 800;
+    font-size: clamp(28px, 5.4vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -.02em;
     text-wrap: balance;
-    color: #fff;
-    -webkit-text-stroke: .2em var(--black);
-    paint-order: stroke fill;
-    text-shadow: 0 .07em 0 var(--indigo);
+    text-shadow: 0 2px 26px rgba(30,20,130,.65);
   }
 
-  /* ---------- Countdown / Download button ---------- */
-  .cta {
+  /* ---------- Screenshot carousel ---------- */
+  .gallery {
+    --r: 34px;
+    width: min(960px, 100%);
+    padding: 10px;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .viewport {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    background: #0a0820;
+    transition: opacity .25s ease;
+    outline-offset: 3px;
+  }
+  .viewport::-webkit-scrollbar { display: none; }
+  .viewport.fade { opacity: 0; }
+  .slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+  .slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .gallery .arrow {
+    --r: 50%;
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    margin-top: -25px;
+    padding: 0;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .18s cubic-bezier(.3,1.4,.5,1), filter .2s;
+  }
+  .gallery .arrow:hover { transform: scale(1.1); filter: brightness(1.15); }
+  .gallery .arrow:active { transform: scale(.94); }
+  .gallery .arrow:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .gallery .arrow svg { width: 22px; height: 22px; }
+  .gallery .prev { left: 24px; }
+  .gallery .next { right: 24px; }
+
+  .dots {
+    --r: 999px;
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    padding: 2px 8px;
+    transform: translateX(-50%);
+  }
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 17px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transition: width .3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dot.active { width: 36px; }
+  .dot i {
+    position: relative;
+    display: block;
+    width: 8px;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.5);
+    transition: width .3s ease;
+  }
+  .dot.active i { width: 30px; background: rgba(255,255,255,.35); }
+  .dot i::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  /* the 5 second timer for the next slide is this fill animation */
+  .dot.active i::after { animation: fill 5s linear forwards; }
+  @keyframes fill { to { transform: scaleX(1); } }
+  .gallery.hold .dot.active i::after,
+  .gallery.offscreen .dot.active i::after { animation-play-state: paused; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    --r: 999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(10px, 3vw, 22px);
-    min-height: 88px;
-    padding: 12px clamp(18px, 4vw, 38px);
-    border: 5px solid var(--black);
-    border-radius: 24px;
-    background: var(--ink);
-    box-shadow: 0 8px 0 var(--black);
-    color: var(--sky-pale);
-    font-family: var(--display);
+    min-height: 58px;
+    padding: 0 40px;
+    border: 0;
+    color: #fff;
+    font: 700 20px/1 var(--text);
+    letter-spacing: .01em;
     text-decoration: none;
-    user-select: none;
+    text-shadow: 0 1px 8px rgba(10,6,70,.55);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .2s cubic-bezier(.3,1.4,.5,1), filter .2s;
+  }
+  .btn.primary,
+  .cta.ready {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.04) 46%, rgba(255,255,255,.14)),
+      linear-gradient(135deg, rgba(91,155,255,.78), rgba(58,47,209,.7));
+  }
+  .btn.primary:hover,
+  .cta.ready:hover { transform: translateY(-2px) scale(1.03); filter: brightness(1.12); }
+  .btn.primary:active,
+  .cta.ready:active { transform: scale(.97); }
+  .btn:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+  /* ---------- Release 0.1.2 ---------- */
+  .release {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+  }
+  .chip {
+    --r: 999px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .06em;
+    color: var(--sky-pale);
+    text-shadow: 0 1px 8px rgba(10,6,70,.5);
+  }
+  .cta {
+    --r: 32px;
+    gap: 0;
+    max-width: 100%;
+    min-height: 96px;
+    padding: 16px clamp(6px, 2vw, 22px);
+    font-weight: 700;
     cursor: default;
+    user-select: none;
   }
   .unit {
     display: grid;
     justify-items: center;
+    padding: 0 clamp(7px, 3vw, 26px);
     line-height: 1;
   }
+  .unit + .unit { border-left: 1px solid rgba(255,255,255,.2); }
   .num {
-    min-width: 1.7ch;
+    min-width: 2ch;
     text-align: center;
-    font-size: clamp(30px, 8.4vw, 48px);
+    font-size: clamp(26px, 8.2vw, 46px);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
   }
   .lab {
-    margin-top: 7px;
-    font: 500 12px/1 var(--text);
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 500;
     letter-spacing: .04em;
     color: var(--mic-light);
   }
-
   .cta.ready {
-    padding: 14px clamp(34px, 9vw, 70px);
-    background: linear-gradient(180deg, var(--sky), var(--indigo));
-    color: #fff;
-    font-size: clamp(36px, 9vw, 52px);
-    line-height: 1.1;
-    letter-spacing: .02em;
-    -webkit-text-stroke: .16em var(--black);
-    paint-order: stroke fill;
+    padding: 10px clamp(36px, 10vw, 84px);
+    font-size: clamp(28px, 7vw, 40px);
     cursor: pointer;
-    transition: transform .12s ease, box-shadow .12s ease;
-    animation: glow 1.2s ease-in-out infinite;
+    animation: glow 1.6s ease-in-out infinite;
   }
   @keyframes glow {
-    0%, 100% { box-shadow: 0 8px 0 var(--black), 0 0 0 0 rgba(91, 155, 255, 0); }
-    50%      { box-shadow: 0 8px 0 var(--black), 0 0 36px 8px rgba(91, 155, 255, .65); }
+    0%, 100% { box-shadow: inset 0 1px 1px rgba(255,255,255,.6), inset 0 -1px 1px rgba(255,255,255,.2), 0 18px 40px -10px rgba(5,3,30,.5), 0 0 0 0 rgba(91,155,255,0); }
+    50%      { box-shadow: inset 0 1px 1px rgba(255,255,255,.6), inset 0 -1px 1px rgba(255,255,255,.2), 0 18px 40px -10px rgba(5,3,30,.5), 0 0 44px 8px rgba(91,155,255,.6); }
   }
-  .cta.ready:hover { transform: translateY(-3px); }
-  .cta.ready:active { transform: translateY(6px); box-shadow: 0 2px 0 var(--black); }
-  .cta.ready:focus-visible { outline: 4px solid #fff; outline-offset: 5px; }
+  .hint { font-size: 15px; color: var(--sky-pale); text-shadow: 0 1px 8px rgba(10,6,70,.6); }
 
-  .hint {
-    margin-top: -4px;
-    font-size: 15px;
-    color: var(--sky-pale);
-  }
-
-  /* ---------- What's inside ---------- */
-  .info {
-    position: relative;
+  /* ---------- Text panels ---------- */
+  .stack {
+    display: grid;
+    gap: clamp(36px, 6vw, 56px);
     width: min(760px, calc(100% - 32px));
-    margin: clamp(40px, 7vw, 64px) auto 56px;
-    padding: clamp(24px, 4vw, 38px);
-    background: rgba(26, 20, 52, .8);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border: 5px solid var(--black);
-    border-radius: 26px;
-    box-shadow: 0 10px 0 var(--black);
+    margin: clamp(44px, 7vw, 68px) auto 0;
+    padding-bottom: 64px;
   }
+  .panel { --r: 30px; padding: clamp(24px, 4vw, 38px); }
+  .info h2, .demo h2 {
+    font-weight: 700;
+    letter-spacing: -.02em;
+    text-shadow: 0 1px 12px rgba(10,6,70,.5);
+  }
+  .info h2 { margin-bottom: 18px; font-size: clamp(26px, 4.6vw, 34px); }
   .sticker {
     position: absolute;
     top: -38px;
-    right: 6px;
+    right: 14px;
     width: 64px;
     height: 64px;
     transform: rotate(10deg);
-    filter: drop-shadow(0 4px 0 var(--black));
+    filter: drop-shadow(0 6px 10px rgba(5,3,30,.45));
   }
-  .info h2 {
-    margin-bottom: 16px;
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: clamp(28px, 5vw, 36px);
-    color: var(--sky);
-    -webkit-text-stroke: .2em var(--black);
-    paint-order: stroke fill;
-  }
-  .info ul {
-    display: grid;
-    gap: 13px;
-    padding: 0;
-    list-style: none;
-  }
+  .info ul { display: grid; gap: 13px; padding: 0; list-style: none; }
   .info li {
     display: grid;
     grid-template-columns: 22px 1fr;
     gap: 14px;
     align-items: start;
-    font-size: clamp(16px, 2.4vw, 18px);
     max-width: 62ch;
+    font-size: clamp(16px, 2.4vw, 18px);
   }
   /* bullets are the four note arrows of the game */
   .info li::before {
@@ -244,31 +479,64 @@
     clip-path: polygon(50% 0, 100% 50%, 70% 50%, 70% 100%, 30% 100%, 30% 50%, 0 50%);
     transform: rotate(var(--r));
   }
-  .info li:nth-child(4n + 1) { --c: #c24b99; --r: -90deg; }
-  .info li:nth-child(4n + 2) { --c: #00e5ff; --r: 180deg; }
-  .info li:nth-child(4n + 3) { --c: #12fa05; --r: 0deg; }
-  .info li:nth-child(4n + 4) { --c: #f9393f; --r: 90deg; }
+  .info li:nth-child(4n + 1) { --c: #d65db1; --r: -90deg; }
+  .info li:nth-child(4n + 2) { --c: #2ee6ff; --r: 180deg; }
+  .info li:nth-child(4n + 3) { --c: #3dff4f; --r: 0deg; }
+  .info li:nth-child(4n + 4) { --c: #ff5a60; --r: 90deg; }
 
   .warn {
+    --r: 20px;
     margin-top: 26px;
-    padding: 14px 18px;
-    border-left: 6px solid #ffc83c;
-    border-radius: 6px 14px 14px 6px;
-    background: rgba(255, 200, 60, .12);
+    padding: 15px 18px;
+    max-width: 66ch;
     font-size: 15.5px;
     color: #fff3cf;
-    max-width: 66ch;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.03) 50%, rgba(255,255,255,.08)),
+      rgba(255,190,60,.16);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
-  /* ---------- Reduced motion ---------- */
+  .demo { display: grid; justify-items: center; gap: 14px; text-align: center; scroll-margin-top: 96px; }
+  .demo .demo-icon { width: 64px; height: 64px; filter: drop-shadow(0 6px 10px rgba(5,3,30,.45)); }
+  .demo h2 { font-size: clamp(26px, 5vw, 36px); }
+  .demo p { max-width: 40ch; color: var(--sky-pale); font-size: clamp(16px, 2.4vw, 18px); }
+  .demo .btn { margin-top: 8px; }
+
+  /* ---------- Phones ---------- */
+  @media (max-width: 719px) {
+    .brand-text { display: none; }
+    .kicker { display: block; }
+    .bar { padding: 6px 7px 6px 8px; }
+    .badge { width: 40px; height: 40px; }
+    .badge img { width: 30px; height: 30px; }
+    .tab { padding: 10px 12px; font-size: 14px; }
+    .gallery { --r: 26px; padding: 7px; }
+    .viewport { border-radius: 19px; }
+    .gallery .arrow { width: 40px; height: 40px; margin-top: -20px; }
+    .gallery .arrow svg { width: 18px; height: 18px; }
+    .gallery .prev { left: 14px; }
+    .gallery .next { right: 14px; }
+    .dots { bottom: 12px; }
+    .btn { min-height: 54px; padding: 0 34px; font-size: 19px; }
+  }
+  @media (max-width: 360px) {
+    .tab { padding: 10px 9px; font-size: 13px; }
+    .badge { display: none; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     .logo, .cta.ready { animation: none; }
+    .dot.active i::after { animation: none; transform: scaleX(1); } /* no autoplay */
+    .lens, .viewport { transition: none; }
   }
 
   noscript p { text-align: center; padding: 8px 16px; color: var(--sky-pale); }
 </style>
 </head>
-<body>
+<body id="top">
 
 <div class="bg" aria-hidden="true">
   <video id="bgvideo" autoplay muted loop playsinline preload="auto" poster="assets/poster.jpg">
@@ -277,50 +545,102 @@
 </div>
 
 <header class="top">
-  <span class="badge"><img src="assets/icon.png" alt="" width="40" height="40"></span>
-  <p class="kicker">Friday Night Funkin’ Vs Vindix</p>
+  <nav class="bar glass" aria-label="Main">
+    <a class="brand" href="#top">
+      <span class="badge"><img src="assets/icon.png" alt="" width="34" height="34"></span>
+      <span class="brand-text">Friday Night Funkin’ Vs Vindix</span>
+    </a>
+    <div class="tabs" id="tabs">
+      <span class="lens no-anim" id="lens" aria-hidden="true"></span>
+      <a class="tab active" id="tab-home" href="#top" aria-current="page">Home</a>
+      <a class="tab" id="tab-demo" href="#demo">Demo version</a>
+      <a class="tab" href="https://on.soundcloud.com/yqqnW4cQoWGd8KAL6x" target="_blank" rel="noopener">Songs
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2h6v6M10 2 3 9"/></svg>
+      </a>
+    </div>
+  </nav>
 </header>
 
 <main>
   <section class="hero">
+    <p class="kicker">Friday Night Funkin’ Vs Vindix</p>
     <img class="logo" src="assets/logo.png" width="747" height="421" alt="Friday Night Funkin’ Vs Vindix logo">
 
-    <h1>The wait is over — Vindix is back!</h1>
+    <h1>The wait is over&nbsp;— Vindix is back!</h1>
 
-    <a id="cta" class="cta" aria-disabled="true">
-      <span class="unit"><span class="num" id="d">--</span><span class="lab">days</span></span>
-      <span class="unit"><span class="num" id="h">--</span><span class="lab">hours</span></span>
-      <span class="unit"><span class="num" id="m">--</span><span class="lab">minutes</span></span>
-      <span class="unit"><span class="num" id="s">--</span><span class="lab">seconds</span></span>
-    </a>
-    <p id="hint" class="hint">Download unlocks on December 15</p>
-    <noscript><p>Turn on JavaScript to see the countdown.</p></noscript>
+    <!-- Screenshots: first one sits right above the timer -->
+    <section class="gallery glass" id="gallery" aria-roledescription="carousel" aria-label="Game screenshots">
+      <div class="viewport" id="viewport" tabindex="0">
+        <figure class="slide"><img src="assets/shots/shot1.jpg" width="1220" height="747" alt="Friday Night Funkin’ Vs Vindix title card with the logo and a silhouette of Vindix" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot2.jpg" width="1280" height="720" alt="Title screen with Vindix and the text Press Enter to Begin" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot3.jpg" width="1280" height="720" alt="Tutorial Vindix: Vindix and Boyfriend face off at sunset in the park" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot4.jpg" width="1280" height="720" alt="Chronociol: pink silhouettes on a grey background and a long green note" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot5.jpg" width="1280" height="720" alt="Let’s Light Up: a rainy night in the park" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot6.jpg" width="1280" height="720" alt="A song in widescreen with a green-haired opponent and falling notes" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot7.jpg" width="1280" height="720" alt="Beatbreaker (Pico Mix): Vindix and Pico on a night stage" decoding="async"></figure>
+        <figure class="slide"><img src="assets/shots/shot8.jpg" width="1280" height="720" alt="Diamond Flow: a Minecraft-style village scene with pixel notes" decoding="async"></figure>
+      </div>
+      <button class="arrow prev glass" id="prev" type="button" aria-label="Previous screenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+      </button>
+      <button class="arrow next glass" id="next" type="button" aria-label="Next screenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
+      <div class="dots glass" id="dots"></div>
+    </section>
+
+    <section class="release" aria-label="Release 0.1.2 countdown">
+      <p class="chip glass">Release 0.1.2</p>
+      <a id="cta" class="btn cta glass" aria-disabled="true">
+        <span class="unit"><span class="num" id="d">--</span><span class="lab">days</span></span>
+        <span class="unit"><span class="num" id="h">--</span><span class="lab">hours</span></span>
+        <span class="unit"><span class="num" id="m">--</span><span class="lab">minutes</span></span>
+        <span class="unit"><span class="num" id="s">--</span><span class="lab">seconds</span></span>
+      </a>
+      <p id="hint" class="hint">Version 0.1.2 unlocks on December 15</p>
+      <noscript><p>Turn on JavaScript to see the countdown.</p></noscript>
+    </section>
   </section>
 
-  <section class="info">
-    <img class="sticker" src="assets/icon.png" width="64" height="64" alt="">
-    <h2>What’s inside:</h2>
-    <ul>
-      <li>Week V with 4 intense tracks to test your rhythm</li>
-      <li>5 Bonus songs that flip the script when you least expect it</li>
-      <li>5 Erect Mixes — harder, faster, and built to push your limits</li>
-      <li>3 Pico Mixes that just hit different</li>
-      <li>A fully custom UI &amp; revamped menus</li>
-      <li>Spectacular events &amp; unexpected modcharts</li>
-    </ul>
-    <p class="warn">⚠️ <strong>Flashing Lights Note:</strong> Only affects specific tracks. An in-game warning will appear before those sections, and we made sure toggling “Flashing Lights” OFF in the settings fully disables the flashes.</p>
-  </section>
+  <div class="stack">
+    <section class="info panel glass">
+      <img class="sticker" src="assets/icon.png" width="64" height="64" alt="">
+      <h2>What’s inside:</h2>
+      <ul>
+        <li>Week V with 4 intense tracks to test your rhythm</li>
+        <li>5 Bonus songs that flip the script when you least expect it</li>
+        <li>5 Erect Mixes — harder, faster, and built to push your limits</li>
+        <li>3 Pico Mixes that just hit different</li>
+        <li>A fully custom UI &amp; revamped menus</li>
+        <li>Spectacular events &amp; unexpected modcharts</li>
+      </ul>
+      <p class="warn glass">⚠️ <strong>Flashing Lights Note:</strong> Only affects specific tracks. An in-game warning will appear before those sections, and we made sure toggling “Flashing Lights” OFF in the settings fully disables the flashes.</p>
+    </section>
+
+    <section class="demo panel glass" id="demo" aria-labelledby="demo-title">
+      <img class="demo-icon" src="assets/icon.png" width="64" height="64" alt="">
+      <h2 id="demo-title">Demo version 0.1.1</h2>
+      <p>Can’t wait for 0.1.2? The demo is available right now.</p>
+      <a class="btn primary glass" href="https://gamebanana.com/wips/90241" target="_blank" rel="noopener">Download</a>
+    </section>
+  </div>
 </main>
 
 <script>
   /* ===================== CONFIG ===================== */
-  // Release moment: 15 December 2026, 00:00 in the visitor's local time.
+  // Release 0.1.2 moment: 15 December 2026, 00:00 in the visitor's local time.
   // Month is 0-based: 11 = December.
   var RELEASE = new Date(2026, 11, 15, 0, 0, 0);
   var DOWNLOAD_URL = 'https://gamebanana.com/mods/681142';
+  // Other links are written directly in the HTML above:
+  //   Demo 0.1.1 -> https://gamebanana.com/wips/90241
+  //   Songs      -> https://on.soundcloud.com/yqqnW4cQoWGd8KAL6x
   /* ================================================== */
 
   (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- Countdown ---------- */
     var cta  = document.getElementById('cta');
     var hint = document.getElementById('hint');
     var out  = {
@@ -340,7 +660,7 @@
       if (ready) return;
       ready = true;
       clearInterval(timer);
-      cta.className = 'cta ready';
+      cta.className = 'btn cta glass ready';
       cta.textContent = 'Download';
       cta.href = DOWNLOAD_URL;
       cta.target = '_blank';
@@ -368,15 +688,143 @@
     tick();
     if (!ready) timer = setInterval(tick, 250);
 
-    // Background video: respect reduced motion, ignore blocked autoplay.
+    /* ---------- Background video ---------- */
     var v = document.getElementById('bgvideo');
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduce) {
       v.removeAttribute('autoplay');
       v.pause();
     } else if (v.play) {
       var p = v.play();
       if (p && p.catch) p.catch(function () {});
     }
+
+    /* ---------- Screenshot carousel ---------- */
+    var gal   = document.getElementById('gallery');
+    var vp    = document.getElementById('viewport');
+    var dotsB = document.getElementById('dots');
+    var n     = vp.children.length;
+    var dotEls = [];
+    var index = -1;
+    var jumping = false;
+
+    function setIndex(i) {
+      if (i === index) return;
+      index = i;
+      for (var k = 0; k < n; k++) {
+        var on = k === i;
+        dotEls[k].classList.toggle('active', on);
+        if (on) dotEls[k].setAttribute('aria-current', 'true');
+        else dotEls[k].removeAttribute('aria-current');
+      }
+    }
+    function go(i) {
+      vp.scrollTo({ left: i * vp.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+    }
+    // wrap-around (last -> first, first -> last) with a quick fade instead of a long rewind
+    function jump(i) {
+      if (jumping) return;
+      jumping = true;
+      vp.classList.add('fade');
+      setTimeout(function () {
+        vp.scrollTo({ left: i * vp.clientWidth, behavior: 'auto' });
+        setIndex(i);
+        vp.classList.remove('fade');
+        jumping = false;
+      }, reduce ? 0 : 260);
+    }
+    function nextSlide() { if (index >= n - 1) jump(0); else go(index + 1); }
+    function prevSlide() { if (index <= 0) jump(n - 1); else go(index - 1); }
+
+    for (var i = 0; i < n; i++) {
+      (function (k) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'dot';
+        b.setAttribute('aria-label', 'Screenshot ' + (k + 1));
+        b.innerHTML = '<i></i>';
+        b.addEventListener('click', function () { go(k); });
+        dotsB.appendChild(b);
+        dotEls.push(b);
+      })(i);
+    }
+    setIndex(0);
+
+    document.getElementById('prev').addEventListener('click', prevSlide);
+    document.getElementById('next').addEventListener('click', nextSlide);
+
+    var ticking = false;
+    vp.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        setIndex(Math.max(0, Math.min(n - 1, Math.round(vp.scrollLeft / vp.clientWidth))));
+      });
+    }, { passive: true });
+
+    vp.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); prevSlide(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
+    });
+    window.addEventListener('resize', function () {
+      vp.scrollTo({ left: index * vp.clientWidth, behavior: 'auto' });
+    });
+
+    // Autoplay: the fill animation on the active dot lasts 5 s; when it ends, go to the next slide.
+    dotsB.addEventListener('animationend', function (e) {
+      if (e.animationName === 'fill') nextSlide();
+    });
+    // Pause while the mouse is over the carousel or a control has focus, and while it is off screen.
+    gal.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') gal.classList.add('hold'); });
+    gal.addEventListener('pointerleave', function () { gal.classList.remove('hold'); });
+    gal.addEventListener('focusin',  function () { gal.classList.add('hold'); });
+    gal.addEventListener('focusout', function () { gal.classList.remove('hold'); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        gal.classList.toggle('offscreen', !entries[0].isIntersecting);
+      }, { threshold: 0.15 }).observe(gal);
+    }
+
+    /* ---------- Top tabs: sliding glass lens + active tab ---------- */
+    var lens    = document.getElementById('lens');
+    var tabHome = document.getElementById('tab-home');
+    var tabDemo = document.getElementById('tab-demo');
+    var demo    = document.getElementById('demo');
+    var current = 'home';
+
+    function placeLens() {
+      var el = current === 'demo' ? tabDemo : tabHome;
+      lens.style.opacity = '1';
+      lens.style.width = el.offsetWidth + 'px';
+      lens.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+    }
+    function setActive(key) {
+      if (key === current) return;
+      current = key;
+      tabHome.classList.toggle('active', key === 'home');
+      tabDemo.classList.toggle('active', key === 'demo');
+      if (key === 'home') tabHome.setAttribute('aria-current', 'page'); else tabHome.removeAttribute('aria-current');
+      if (key === 'demo') tabDemo.setAttribute('aria-current', 'location'); else tabDemo.removeAttribute('aria-current');
+      placeLens();
+    }
+    function updateActive() {
+      var top = demo.getBoundingClientRect().top;
+      var atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+      setActive((top < window.innerHeight * 0.55 || atEnd) ? 'demo' : 'home');
+    }
+
+    placeLens();
+    requestAnimationFrame(function () { lens.classList.remove('no-anim'); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeLens);
+    window.addEventListener('resize', placeLens);
+
+    var scrollTicking = false;
+    window.addEventListener('scroll', function () {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(function () { scrollTicking = false; updateActive(); });
+    }, { passive: true });
+    updateActive();
   })();
 </script>
 </body>
