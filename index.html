@@ -439,6 +439,33 @@
   }
   .hint { font-size: 15px; color: var(--sky-pale); text-shadow: 0 1px 8px rgba(10,6,70,.6); }
 
+  /* small platform icons (Windows 11, Linux) centred under the hint */
+  .platforms {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: -2px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .plat {
+    --r: 15px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+  }
+  .plat img {
+    position: relative;
+    z-index: 3;                 /* icons stay above the glass layers */
+    display: block;
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 5px rgba(10,6,70,.55));
+  }
+
   /* ---------- Text panels ---------- */
   .stack {
     display: grid;
@@ -618,6 +645,10 @@
         <span class="unit"><span class="num" id="s">--</span><span class="lab">seconds</span></span>
       </a>
       <p id="hint" class="hint">Version 0.1.2 unlocks on December 15</p>
+      <ul class="platforms" aria-label="Platforms">
+        <li class="plat glass" title="Windows 11"><img src="assets/platforms/windows11.png" width="26" height="26" alt="Windows 11"></li>
+        <li class="plat glass" title="Linux"><img src="assets/platforms/linux.png" width="26" height="26" alt="Linux"></li>
+      </ul>
       <noscript><p>Turn on JavaScript to see the countdown.</p></noscript>
     </section>
   </section>
