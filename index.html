@@ -68,6 +68,7 @@
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 1;
     padding: 1.2px;
     border-radius: inherit;
     pointer-events: none;
@@ -124,13 +125,15 @@
     padding: 7px 8px 7px 10px;
   }
   .brand {
+    flex: none;
     display: flex;
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    min-width: 0;
   }
   .badge {
+    position: relative;
+    z-index: 3;
     flex: none;
     display: grid;
     place-items: center;
@@ -341,8 +344,8 @@
     transform: scaleX(0);
     transform-origin: left;
   }
-  /* the 5 second timer for the next slide is this fill animation */
-  .dot.active i::after { animation: fill 5s linear forwards; }
+  /* progress bar of the active dot; it restarts together with the 5 s clock (see script) */
+  .dot.active.run i::after { animation: fill 5s linear forwards; }
   @keyframes fill { to { transform: scaleX(1); } }
   .gallery.hold .dot.active i::after,
   .gallery.offscreen .dot.active i::after { animation-play-state: paused; }
@@ -453,6 +456,7 @@
   .info h2 { margin-bottom: 18px; font-size: clamp(26px, 4.6vw, 34px); }
   .sticker {
     position: absolute;
+    z-index: 3;
     top: -38px;
     right: 14px;
     width: 64px;
@@ -499,7 +503,7 @@
   }
 
   .demo { display: grid; justify-items: center; gap: 14px; text-align: center; scroll-margin-top: 96px; }
-  .demo .demo-icon { width: 64px; height: 64px; filter: drop-shadow(0 6px 10px rgba(5,3,30,.45)); }
+  .demo .demo-icon { position: relative; z-index: 3; width: 64px; height: 64px; filter: drop-shadow(0 6px 10px rgba(5,3,30,.45)); }
   .demo h2 { font-size: clamp(26px, 5vw, 36px); }
   .demo p { max-width: 40ch; color: var(--sky-pale); font-size: clamp(16px, 2.4vw, 18px); }
   .demo .btn { margin-top: 8px; }
@@ -521,15 +525,31 @@
     .dots { bottom: 12px; }
     .btn { min-height: 54px; padding: 0 34px; font-size: 19px; }
   }
-  @media (max-width: 360px) {
-    .tab { padding: 10px 9px; font-size: 13px; }
-    .badge { display: none; }
+  @media (max-width: 380px) {
+    .bar { gap: 8px; }
+    .tab { padding: 10px 10px; font-size: 13.5px; }
+    .badge { width: 36px; height: 36px; }
+    .badge img { width: 28px; height: 28px; }
+  }
+  @media (max-width: 340px) {
+    .bar { gap: 6px; padding: 5px 6px; }
+    .tabs { padding: 3px; }
+    .tab { padding: 9px 7px; font-size: 12.5px; gap: 3px; }
+    .tab svg { width: 10px; height: 10px; }
+    .badge { width: 32px; height: 32px; }
+    .badge img { width: 24px; height: 24px; }
+  }
+
+  @media (max-width: 310px) {
+    .unit { padding: 0 6px; }
+    .num { font-size: 24px; }
+    .tab { padding: 9px 5px; font-size: 12px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .logo, .cta.ready { animation: none; }
-    .dot.active i::after { animation: none; transform: scaleX(1); } /* no autoplay */
+    .dot.active i::after { transform: scaleX(1); } /* static bar, slides still change by themselves */
     .lens, .viewport { transition: none; }
   }
 
@@ -699,6 +719,7 @@
     }
 
     /* ---------- Screenshot carousel ---------- */
+    var AUTO_MS = 5000;               // time between automatic slide changes
     var gal   = document.getElementById('gallery');
     var vp    = document.getElementById('viewport');
     var dotsB = document.getElementById('dots');
@@ -706,17 +727,37 @@
     var dotEls = [];
     var index = -1;
     var jumping = false;
+    var elapsed = 0;                  // how long this slide has been on screen (frozen while paused)
+    var autoPending = 0;              // when the last automatic move started (keeps the rhythm at exactly 5 s)
+    var hovering = false, kbFocus = false;
 
+    // restart the 5 s clock and the progress bar of the active dot
+    function resetClock() {
+      elapsed = 0;
+      if (reduce || index < 0) return;
+      var d = dotEls[index];
+      d.classList.remove('run');
+      void d.offsetWidth;             // lets the browser restart the animation
+      d.classList.add('run');
+    }
     function setIndex(i) {
       if (i === index) return;
       index = i;
       for (var k = 0; k < n; k++) {
         var on = k === i;
         dotEls[k].classList.toggle('active', on);
+        if (!on) dotEls[k].classList.remove('run');
         if (on) dotEls[k].setAttribute('aria-current', 'true');
         else dotEls[k].removeAttribute('aria-current');
       }
+      resetClock();
+      if (autoPending) {              // slide change started by the autoplay: count the time already spent moving
+        var spent = Date.now() - autoPending;
+        if (spent < 1500) elapsed = spent;
+        autoPending = 0;
+      }
     }
+    function userAction() { autoPending = 0; resetClock(); }
     function go(i) {
       vp.scrollTo({ left: i * vp.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
     }
@@ -742,15 +783,15 @@
         b.className = 'dot';
         b.setAttribute('aria-label', 'Screenshot ' + (k + 1));
         b.innerHTML = '<i></i>';
-        b.addEventListener('click', function () { go(k); });
+        b.addEventListener('click', function () { go(k); userAction(); });
         dotsB.appendChild(b);
         dotEls.push(b);
       })(i);
     }
     setIndex(0);
 
-    document.getElementById('prev').addEventListener('click', prevSlide);
-    document.getElementById('next').addEventListener('click', nextSlide);
+    document.getElementById('prev').addEventListener('click', function () { prevSlide(); userAction(); });
+    document.getElementById('next').addEventListener('click', function () { nextSlide(); userAction(); });
 
     var ticking = false;
     vp.addEventListener('scroll', function () {
@@ -763,25 +804,53 @@
     }, { passive: true });
 
     vp.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); prevSlide(); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); prevSlide(); userAction(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); userAction(); }
     });
     window.addEventListener('resize', function () {
       vp.scrollTo({ left: index * vp.clientWidth, behavior: 'auto' });
     });
 
-    // Autoplay: the fill animation on the active dot lasts 5 s; when it ends, go to the next slide.
-    dotsB.addEventListener('animationend', function (e) {
-      if (e.animationName === 'fill') nextSlide();
+    /* Autoplay. One heartbeat looks at the current state every 100 ms, so it can never get stuck:
+       whatever happens (interrupted scroll, tap on a button, tab switch), the next check carries on. */
+    function updateHold() { gal.classList.toggle('hold', hovering || kbFocus); }
+    function isPaused() {
+      return gal.classList.contains('hold') || gal.classList.contains('offscreen') || document.hidden;
+    }
+    var lastT = Date.now();
+    setInterval(function () {
+      var now = Date.now();
+      var dt = Math.min(now - lastT, 500);
+      lastT = now;
+      if (jumping || isPaused()) return;
+      elapsed += dt;
+      if (elapsed >= AUTO_MS) {
+        elapsed = 0;
+        var before = index;
+        autoPending = now;
+        nextSlide();
+        // if the move did not happen (scroll was interrupted), start a fresh 5 s round
+        setTimeout(function () { if (index === before) userAction(); }, 1200);
+      }
+    }, 100);
+
+    // Pause only while a mouse is over the carousel or a control is focused with the keyboard.
+    // (A tapped / clicked button keeps focus, so plain focus must NOT pause the slideshow.)
+    gal.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hovering = true; updateHold(); } });
+    gal.addEventListener('pointerleave', function () { hovering = false; updateHold(); });
+    gal.addEventListener('focusin', function (e) {
+      var vis = false;
+      try { vis = e.target.matches(':focus-visible'); } catch (err) {}
+      kbFocus = vis; updateHold();
     });
-    // Pause while the mouse is over the carousel or a control has focus, and while it is off screen.
-    gal.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') gal.classList.add('hold'); });
-    gal.addEventListener('pointerleave', function () { gal.classList.remove('hold'); });
-    gal.addEventListener('focusin',  function () { gal.classList.add('hold'); });
-    gal.addEventListener('focusout', function () { gal.classList.remove('hold'); });
+    gal.addEventListener('focusout', function () { kbFocus = false; updateHold(); });
+    gal.addEventListener('pointerdown', userAction);   // touching the carousel always gives a fresh 5 s
+    document.addEventListener('visibilitychange', userAction);
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
-        gal.classList.toggle('offscreen', !entries[0].isIntersecting);
+        var visible = entries[0].isIntersecting;
+        gal.classList.toggle('offscreen', !visible);
+        if (visible) userAction();
       }, { threshold: 0.15 }).observe(gal);
     }
 
